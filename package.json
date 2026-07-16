@@ -1,0 +1,25 @@
+{
+  "name": "selective-desaturation",
+  "version": "1.0.0",
+  "description": "Remotion composition that desaturates a video to black & white while preserving a configurable hue range, via a GLSL fragment shader on @remotion/three.",
+  "scripts": {
+    "dev": "remotion studio",
+    "build": "remotion render SelectiveDesaturation out/video.mp4",
+    "upgrade": "remotion upgrade",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/three": "^4.0.0",
+    "@react-three/fiber": "^8.16.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.0",
+    "three": "^0.169.0"
+  },
+  "devDependencies": {
+    "@remotion/cli": "^4.0.0",
+    "@types/react": "^18.3.1",
+    "@types/three": "^0.169.0",
+    "typescript": "^5.4.5"
+  }
+}
