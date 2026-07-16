@@ -1,30 +1,33 @@
 /**
- * Assigns one absurd/surrealist caption per clip from the shared text bank
- * (src/data/surreal-text-bank.json), preferring whichever lines have been
- * used least so far across all videos, and writes the usage counts back so
- * the next video's run continues the rotation instead of repeating lines.
+ * Sprinkles a small number of absurd/surrealist captions across a video's
+ * clips (not one per clip — a handful, spread sporadically through the
+ * timeline) from the shared text bank (src/data/surreal-text-bank.json).
+ * Prefers whichever lines have been used least so far across all videos,
+ * and writes the usage counts back so the next video's run continues the
+ * rotation instead of repeating lines.
  *
  * Least-used-first with random tie-breaking, not strict round-robin, so
  * reuse still happens sometimes (as requested) without ever being the same
  * handful of lines every time.
  *
  * Usage:
- *   node scripts/pick-clip-texts.js <clipCount> <projectName> <outClipTextsPath>
+ *   node scripts/pick-clip-texts.js <totalClipCount> <captionCount> <projectName> <outClipTextsPath>
  *
- * Example:
- *   node scripts/pick-clip-texts.js 12 edit-2026-07-16 src/data/edit-clip-texts.json
+ * Example (12 clips in the edit, only 3 get a caption):
+ *   node scripts/pick-clip-texts.js 12 3 edit-2026-07-16 src/data/edit-clip-texts.json
  */
 const fs = require("fs");
 const path = require("path");
 
 const BANK_PATH = path.join(__dirname, "..", "src", "data", "surreal-text-bank.json");
 
-const [, , clipCountArg, projectName, outPath] = process.argv;
-const clipCount = parseInt(clipCountArg, 10);
+const [, , totalClipCountArg, captionCountArg, projectName, outPath] = process.argv;
+const totalClipCount = parseInt(totalClipCountArg, 10);
+const captionCount = parseInt(captionCountArg, 10);
 
-if (!clipCount || !projectName || !outPath) {
+if (!totalClipCount || !captionCount || !projectName || !outPath) {
   console.error(
-    "Usage: node scripts/pick-clip-texts.js <clipCount> <projectName> <outClipTextsPath>"
+    "Usage: node scripts/pick-clip-texts.js <totalClipCount> <captionCount> <projectName> <outClipTextsPath>"
   );
   process.exit(1);
 }
@@ -53,7 +56,25 @@ function pickTexts(entries, count) {
   return chosen;
 }
 
-const chosen = pickTexts(bank.texts, clipCount);
+// Spread the captioned clips sporadically through the timeline instead of
+// clustering: split the clip range into `captionCount` roughly-equal
+// segments and pick one random clip index within each, so captions land a
+// handful of times across the video rather than back to back.
+function pickSporadicClipIndices(clipCount, count) {
+  const segments = Math.min(count, clipCount);
+  const segmentSize = clipCount / segments;
+  const indices = [];
+  for (let s = 0; s < segments; s += 1) {
+    const start = Math.floor(s * segmentSize);
+    const end = Math.floor((s + 1) * segmentSize);
+    const idx = start + Math.floor(Math.random() * Math.max(1, end - start));
+    indices.push(Math.min(idx, clipCount - 1));
+  }
+  return indices;
+}
+
+const clipIndices = pickSporadicClipIndices(totalClipCount, captionCount);
+const chosen = pickTexts(bank.texts, clipIndices.length);
 
 const now = new Date().toISOString();
 const usedCorners = [];
@@ -79,7 +100,7 @@ const clipAssignments = chosen.map((entry, i) => {
     entry.text.length > 60 ? 26 : entry.text.length > 35 ? 31 : 36;
 
   return {
-    clipIndex: i,
+    clipIndex: clipIndices[i],
     text: entry.text,
     corner,
     // small per-clip random tilt/size so it doesn't look like a template
@@ -88,10 +109,14 @@ const clipAssignments = chosen.map((entry, i) => {
   };
 });
 
+clipAssignments.sort((a, b) => a.clipIndex - b.clipIndex);
+
 fs.writeFileSync(BANK_PATH, JSON.stringify(bank, null, 2) + "\n");
 fs.writeFileSync(outPath, JSON.stringify(clipAssignments, null, 2) + "\n");
 
-console.log(`Assigned ${clipAssignments.length} captions for "${projectName}":`);
+console.log(
+  `Assigned ${clipAssignments.length} captions across ${totalClipCount} clips for "${projectName}":`
+);
 for (const c of clipAssignments) {
   console.log(`  clip ${c.clipIndex} [${c.corner}]: ${c.text}`);
 }
