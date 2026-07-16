@@ -1,0 +1,110 @@
+[
+  {
+    "clipIndex": 0,
+    "startFrame": 0,
+    "endFrame": 88,
+    "text": "MY PAST SELF OWES MY FUTURE SELF AN APOLOGY",
+    "corner": "bottom-right",
+    "rotationDeg": 1.7,
+    "fontSizePx": 33
+  },
+  {
+    "clipIndex": 1,
+    "startFrame": 88,
+    "endFrame": 134,
+    "text": "I SIGNED SOMETHING I SHOULDN'T HAVE",
+    "corner": "bottom-left",
+    "rotationDeg": -0.3,
+    "fontSizePx": 29
+  },
+  {
+    "clipIndex": 2,
+    "startFrame": 134,
+    "endFrame": 146,
+    "text": "I INHERITED THIS HAT AND ALSO A DEBT",
+    "corner": "top-left",
+    "rotationDeg": -1.4,
+    "fontSizePx": 30
+  },
+  {
+    "clipIndex": 3,
+    "startFrame": 146,
+    "endFrame": 189,
+    "text": "THIS DOORBELL RINGS IN A DIFFERENT KEY",
+    "corner": "top-right",
+    "rotationDeg": -1.7,
+    "fontSizePx": 32
+  },
+  {
+    "clipIndex": 4,
+    "startFrame": 189,
+    "endFrame": 202,
+    "text": "MY UNCLE IS A FISH NOW",
+    "corner": "bottom-left",
+    "rotationDeg": -0.1,
+    "fontSizePx": 26
+  },
+  {
+    "clipIndex": 5,
+    "startFrame": 202,
+    "endFrame": 239,
+    "text": "THE TOASTER OUTRANKS ME AT THIS POINT",
+    "corner": "bottom-right",
+    "rotationDeg": 1.1,
+    "fontSizePx": 27
+  },
+  {
+    "clipIndex": 6,
+    "startFrame": 239,
+    "endFrame": 253,
+    "text": "I AM LEGALLY A LITTLE BIT OF A DOOR",
+    "corner": "top-right",
+    "rotationDeg": 0.8,
+    "fontSizePx": 28
+  },
+  {
+    "clipIndex": 7,
+    "startFrame": 253,
+    "endFrame": 273,
+    "text": "THIS IS WHAT CHEESE DREAMS ABOUT",
+    "corner": "bottom-left",
+    "rotationDeg": 1.8,
+    "fontSizePx": 32
+  },
+  {
+    "clipIndex": 8,
+    "startFrame": 273,
+    "endFrame": 326,
+    "text": "THE CLOCK IS DOING ITS BEST",
+    "corner": "top-right",
+    "rotationDeg": -1.2,
+    "fontSizePx": 32
+  },
+  {
+    "clipIndex": 9,
+    "startFrame": 326,
+    "endFrame": 346,
+    "text": "THIS IS A SIMULATION OF A SIMULATION",
+    "corner": "top-left",
+    "rotationDeg": 0.3,
+    "fontSizePx": 30
+  },
+  {
+    "clipIndex": 10,
+    "startFrame": 346,
+    "endFrame": 358,
+    "text": "THE FLOORBOARDS VOTED AND I LOST",
+    "corner": "top-right",
+    "rotationDeg": 2.8,
+    "fontSizePx": 32
+  },
+  {
+    "clipIndex": 11,
+    "startFrame": 358,
+    "endFrame": 370,
+    "text": "MY KNEES ARE FROM A DIFFERENT TIMELINE",
+    "corner": "top-left",
+    "rotationDeg": 2.4,
+    "fontSizePx": 26
+  }
+]

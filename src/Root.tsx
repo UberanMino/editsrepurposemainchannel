@@ -7,10 +7,11 @@ import {
 import { ColorGrade, defaultColorGradeProps } from "./ColorGrade";
 import { ForegroundPop, defaultForegroundPopProps } from "./ForegroundPop";
 import { DuotonePop, defaultDuotonePopProps } from "./DuotonePop";
-import { BeatEffects, BeatEvent } from "./BeatEffects";
+import { BeatEffects, BeatEvent, ClipCaption } from "./BeatEffects";
 import backgroundHues1 from "./data/scene-colors.json";
 import backgroundHues2 from "./data/scene-colors2.json";
 import editBeats from "./data/beatEffects.json";
+import editClips from "./data/edit-clips.json";
 
 // Source video lives in public/ and is referenced via staticFile() inside the
 // component. The 4K portrait source is sampled down into this 1080x1920 output.
@@ -112,6 +113,7 @@ export const RemotionRoot: React.FC = () => {
         defaultProps={{
           src: EDIT_SRC,
           beats: editBeats as BeatEvent[],
+          clips: editClips as ClipCaption[],
         }}
       />
     </>

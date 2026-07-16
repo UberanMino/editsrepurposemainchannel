@@ -1,0 +1,383 @@
+{
+  "description": "Shared pool of absurd/surrealist caption easter-eggs for the beat-synced edit pipeline. usageCount/lastUsedAt/lastUsedInProject are updated by scripts/pick-clip-texts.js every time a video draws from this bank, so future videos rotate through it instead of repeating the same lines.",
+  "texts": [
+    {
+      "text": "THE SOUP WAS ALWAYS THE PLAN",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "MY UNCLE IS A FISH NOW",
+      "usageCount": 1,
+      "lastUsedAt": "2026-07-16T13:25:56.271Z",
+      "lastUsedInProject": "ma_mind_einfach_mindisch_1"
+    },
+    {
+      "text": "I USED TO BE A DOOR",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THE MOON OWES ME MONEY",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THIS IS WHAT CHEESE DREAMS ABOUT",
+      "usageCount": 1,
+      "lastUsedAt": "2026-07-16T13:25:56.271Z",
+      "lastUsedInProject": "ma_mind_einfach_mindisch_1"
+    },
+    {
+      "text": "EVERYTHING IS A DOOR IF YOU BELIEVE HARD ENOUGH",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "GRAVITY IS MORE OF A SUGGESTION",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "A PIGEON IS RUNNING THIS NOW",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THE FRIDGE LIGHT NEVER TURNED OFF",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THIS WAS FORETOLD, KIND OF",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "MY DENTIST IS ALSO THE MAYOR NOW",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THE STAIRS GO SOMEWHERE ELSE TODAY",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "MY COUSIN IS TECHNICALLY A LAMP",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THE WIFI PASSWORD IS A FEELING",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "I WON THIS FACE IN A RAFFLE",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THE CEILING IS LISTENING",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "SOMEONE HAS TO BE THE SPOON",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THIS ROOM USED TO BE TUESDAY",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "MY SHADOW FILED A COMPLAINT",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THE COUCH REMEMBERS EVERYTHING",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "I INHERITED THIS HAT AND ALSO A DEBT",
+      "usageCount": 1,
+      "lastUsedAt": "2026-07-16T13:25:56.271Z",
+      "lastUsedInProject": "ma_mind_einfach_mindisch_1"
+    },
+    {
+      "text": "THE MICROWAVE KNOWS WHAT I DID",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "NOBODY VOTED FOR THIS BUT HERE WE ARE",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "MY REFLECTION IS RUNNING LATE",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THE PIGEONS HAVE A SCHEDULE NOW",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THIS IS A SIMULATION OF A SIMULATION",
+      "usageCount": 1,
+      "lastUsedAt": "2026-07-16T13:25:56.271Z",
+      "lastUsedInProject": "ma_mind_einfach_mindisch_1"
+    },
+    {
+      "text": "MY SOCKS UNIONIZED",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THE SUN IS A LITTLE BEHIND SCHEDULE",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "I SIGNED SOMETHING I SHOULDN'T HAVE",
+      "usageCount": 1,
+      "lastUsedAt": "2026-07-16T13:25:56.271Z",
+      "lastUsedInProject": "ma_mind_einfach_mindisch_1"
+    },
+    {
+      "text": "THE WALLS ARE ONLY A SUGGESTION TOO",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "MY GRANDMOTHER PREDICTED THIS EXACT MOMENT",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THIS SANDWICH HAS SEEN THINGS",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "I AM CONTRACTUALLY OBLIGATED TO VIBE",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THE CLOCK IS DOING ITS BEST",
+      "usageCount": 1,
+      "lastUsedAt": "2026-07-16T13:25:56.271Z",
+      "lastUsedInProject": "ma_mind_einfach_mindisch_1"
+    },
+    {
+      "text": "SOMEWHERE A GOOSE IS TAKING CREDIT FOR THIS",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "MY KNEES ARE FROM A DIFFERENT TIMELINE",
+      "usageCount": 1,
+      "lastUsedAt": "2026-07-16T13:25:56.271Z",
+      "lastUsedInProject": "ma_mind_einfach_mindisch_1"
+    },
+    {
+      "text": "THE FLOOR IS LAVA BUT ALSO MY LANDLORD",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "I ONCE MADE EYE CONTACT WITH DESTINY",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THIS OUTFIT WAS A CRY FOR HELP",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THE VENDING MACHINE IS MY THERAPIST NOW",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "MY LEFT SHOE IS THE REAL PROTAGONIST",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THIS HALLWAY DOESN'T END, IT JUST GIVES UP",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "I WAS PROMISED CLOSURE AND GOT A DOORKNOB",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THE BIRDS KNOW AND THEY'RE NOT SAYING",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "MY HOROSCOPE JUST SAID 'RUN'",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THIS IS FINE, ACCORDING TO THE LAMP",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THE TOASTER OUTRANKS ME AT THIS POINT",
+      "usageCount": 1,
+      "lastUsedAt": "2026-07-16T13:25:56.271Z",
+      "lastUsedInProject": "ma_mind_einfach_mindisch_1"
+    },
+    {
+      "text": "I WAS ASKED TO LEAVE REALITY POLITELY",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THE CEILING FAN IS TIMING SOMETHING",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "MY PAST SELF OWES MY FUTURE SELF AN APOLOGY",
+      "usageCount": 1,
+      "lastUsedAt": "2026-07-16T13:25:56.271Z",
+      "lastUsedInProject": "ma_mind_einfach_mindisch_1"
+    },
+    {
+      "text": "THIS DOORBELL RINGS IN A DIFFERENT KEY",
+      "usageCount": 1,
+      "lastUsedAt": "2026-07-16T13:25:56.271Z",
+      "lastUsedInProject": "ma_mind_einfach_mindisch_1"
+    },
+    {
+      "text": "I NEGOTIATED WITH A SQUIRREL AND LOST",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THE STREETLIGHT BLINKS IN MORSE CODE ABOUT ME",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THIS IS MY VILLAIN ORIGIN SANDWICH",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "MY REFLECTION UNFOLLOWED ME",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THE ELEVATOR MUSIC IS ABOUT MY CHILDHOOD",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "I AM LEGALLY A LITTLE BIT OF A DOOR",
+      "usageCount": 1,
+      "lastUsedAt": "2026-07-16T13:25:56.271Z",
+      "lastUsedInProject": "ma_mind_einfach_mindisch_1"
+    },
+    {
+      "text": "THE CAT HAS BEEN APPOINTED CEO",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THIS IS THE PART WHERE THE PLANT TESTIFIES",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "MY REAR-VIEW MIRROR IS FROM THE FUTURE",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THE FLOORBOARDS VOTED AND I LOST",
+      "usageCount": 1,
+      "lastUsedAt": "2026-07-16T13:25:56.271Z",
+      "lastUsedInProject": "ma_mind_einfach_mindisch_1"
+    },
+    {
+      "text": "I WAS THE CHOSEN ONE BUT FOR PARKING",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    },
+    {
+      "text": "THE THERMOSTAT REMEMBERS WHAT YOU SAID",
+      "usageCount": 0,
+      "lastUsedAt": null,
+      "lastUsedInProject": null
+    }
+  ]
+}

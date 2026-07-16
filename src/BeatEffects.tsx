@@ -25,9 +25,45 @@ export type BeatEvent = {
   decayFrames: number;
 };
 
+export type ClipCorner =
+  | "top-left"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-right";
+
+export type ClipCaption = {
+  clipIndex: number;
+  startFrame: number;
+  endFrame: number;
+  text: string;
+  corner: ClipCorner;
+  rotationDeg: number;
+  fontSizePx: number;
+};
+
 export type BeatEffectsProps = {
   src: string;
   beats: BeatEvent[];
+  clips: ClipCaption[];
+};
+
+const CAPTION_POP_FRAMES = 5;
+
+const CORNER_STYLE: Record<ClipCorner, React.CSSProperties> = {
+  "top-left": { top: "6%", left: "6%" },
+  "top-right": { top: "6%", right: "6%", textAlign: "right" },
+  "bottom-left": { bottom: "8%", left: "6%" },
+  "bottom-right": { bottom: "8%", right: "6%", textAlign: "right" },
+};
+
+const findActiveClip = (
+  frame: number,
+  clips: ClipCaption[]
+): ClipCaption | null => {
+  for (const c of clips) {
+    if (frame >= c.startFrame && frame < c.endFrame) return c;
+  }
+  return null;
 };
 
 // How far each effect type is allowed to push at intensity 1.
@@ -71,7 +107,11 @@ const activeBeat = (
   return { beat: candidate, envelope };
 };
 
-export const BeatEffects: React.FC<BeatEffectsProps> = ({ src, beats }) => {
+export const BeatEffects: React.FC<BeatEffectsProps> = ({
+  src,
+  beats,
+  clips,
+}) => {
   const frame = useCurrentFrame();
   const resolvedSrc = src.startsWith("http") ? src : staticFile(src);
 
@@ -179,19 +219,62 @@ export const BeatEffects: React.FC<BeatEffectsProps> = ({ src, beats }) => {
     }
   }
 
+  const activeClip = findActiveClip(frame, clips);
+  let captionNode: React.ReactNode = null;
+  if (activeClip) {
+    const t = frame - activeClip.startFrame;
+    const popProgress = Math.min(1, t / CAPTION_POP_FRAMES);
+    // hard pop-in (not a linear fade), same "abrupt attack" language as the
+    // beat effects: snap most of the way in immediately, ease the last bit.
+    const eased = 1 - Math.pow(1 - popProgress, 3);
+    const opacity = t <= 0 ? 0 : Math.min(1, 0.4 + eased * 0.6) * 0.88;
+    const scale = 0.85 + eased * 0.15;
+
+    captionNode = (
+      <div
+        style={{
+          position: "absolute",
+          ...CORNER_STYLE[activeClip.corner],
+          maxWidth: "42%",
+          fontFamily: "'Courier New', Courier, monospace",
+          fontWeight: 700,
+          textTransform: "uppercase",
+          letterSpacing: "0.04em",
+          lineHeight: 1.25,
+          fontSize: activeClip.fontSizePx,
+          color: "rgba(255,255,255,0.92)",
+          textShadow:
+            "0 0 6px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9), 1px 1px 0 rgba(0,0,0,0.6)",
+          opacity,
+          transform: `rotate(${activeClip.rotationDeg}deg) scale(${scale})`,
+          transformOrigin:
+            activeClip.corner === "top-left" ||
+            activeClip.corner === "bottom-left"
+              ? "left center"
+              : "right center",
+        }}
+      >
+        {activeClip.text}
+      </div>
+    );
+  }
+
   return (
     <AbsoluteFill style={{ backgroundColor: "black", overflow: "hidden" }}>
-      <OffthreadVideo
-        src={resolvedSrc}
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          filter,
-          transform: `translate(${translateX}px, ${translateY}px) rotate(${rotate}deg) skew(${skewX}deg, ${skewY}deg) scale(${scaleX}, ${scaleY})`,
-        }}
-      />
-      {glitchLayers}
+      <AbsoluteFill style={{ transform: "scaleX(-1)" }}>
+        <OffthreadVideo
+          src={resolvedSrc}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            filter,
+            transform: `translate(${translateX}px, ${translateY}px) rotate(${rotate}deg) skew(${skewX}deg, ${skewY}deg) scale(${scaleX}, ${scaleY})`,
+          }}
+        />
+        {glitchLayers}
+      </AbsoluteFill>
+      {captionNode}
     </AbsoluteFill>
   );
 };
