@@ -1,10 +1,17 @@
-# Selective Desaturation (Remotion + Three.js)
+# Video Color Effects (Remotion)
 
-A [Remotion](https://www.remotion.dev/) composition that turns a video black &
-white **except** for a configurable range of hues, which keep their original
-color. Think "one red rose in a grayscale scene", applied to video.
+Two [Remotion](https://www.remotion.dev/) compositions built on the same
+source clip (`public/input.mp4`):
 
-The effect is implemented as a **GLSL fragment shader** running on
+- **`SelectiveDesaturation`** — a GLSL shader (via `@remotion/three`) that
+  turns the video black & white except for a configurable hue range.
+- **`ColorGrade`** — a plain CSS-filter grade: boosted saturation + contrast,
+  with the hue rotating continuously over the clip.
+
+## `SelectiveDesaturation`
+
+Think "one red rose in a grayscale scene", applied to video. Implemented as a
+**GLSL fragment shader** running on
 [`@remotion/three`](https://www.remotion.dev/docs/three), fed frame-accurately
 by [`useOffthreadVideoTexture()`](https://www.remotion.dev/docs/use-offthread-video-texture).
 For every pixel the shader:
@@ -14,7 +21,7 @@ For every pixel the shader:
    the preserved band — with a soft, feathered edge and gates that ignore
    near-gray / very dark pixels whose hue is unreliable.
 
-## The variable you adjust
+### The variable you adjust
 
 Everything lives in `defaultSelectiveDesaturationProps` in
 [`src/SelectiveDesaturation.tsx`](src/SelectiveDesaturation.tsx). Hues are in
@@ -42,22 +49,61 @@ export const defaultSelectiveDesaturationProps = {
 - **Preserve a wider/narrower range?** Change `hueRange` and `hueSoftness`.
 - **Too much noise surviving in dull areas?** Raise `minSaturation`.
 
-You can also override any of these per-render from the Remotion Studio props
-panel or via `--props`.
+### Implementation note
+
+During rendering, `<ThreeCanvas>` runs with `frameloop="never"` and only draws
+the scene when the frame number changes. The off-thread video texture, however,
+resolves **asynchronously** after that draw, so `ShaderPlane` calls
+`useThree().advance()` once the texture is in place to force a redraw before
+Remotion captures the frame. Without this the shader would sample an empty
+texture and render black.
+
+## `ColorGrade`
+
+A CSS `filter` color grade applied directly to `<OffthreadVideo>` — no
+Three.js needed. Defined in [`src/ColorGrade.tsx`](src/ColorGrade.tsx):
+
+```ts
+export const defaultColorGradeProps = {
+  saturation: 1.6,       // saturate() multiplier — 1 = unchanged
+  contrast: 1.15,        // contrast() multiplier — 1 = unchanged
+  rotationsPerClip: 1,   // full 360° hue-rotate() cycles over the clip
+};
+```
+
+The hue angle is computed from `useCurrentFrame()` each frame:
+
+```ts
+const hueRotateDeg = (frame / durationInFrames) * 360 * rotationsPerClip;
+```
+
+**Why the foreground pops without any masking:** `saturate()` scales
+saturation *multiplicatively*. A pixel that's already vivid (the colorful
+subject) gets pushed much further than a near-gray pixel (sky, pavement,
+muted background), which stays close to gray no matter how far the hue is
+rotated. So as long as the subject is the most saturated thing in the shot to
+begin with — true of most foreground-subject footage — boosting saturation
+uniformly makes it pop *relative to* the background for free.
+
+- **Rotate faster/slower?** Change `rotationsPerClip` (0.5 = half a rotation
+  over the whole clip, 2 = two full spins).
+- **More/less vivid?** Change `saturation`.
+- **Punchier shadows/highlights?** Change `contrast`.
 
 ## Run it
 
 ```bash
 npm install
 
-# Interactive studio (tweak the hue band live)
+# Interactive studio (tweak props live)
 npm run dev
 
-# Render to out/video.mp4
-npm run build
+# Render either composition
+npx remotion render SelectiveDesaturation out/desaturation.mp4
+npx remotion render ColorGrade out/colorgrade.mp4
 ```
 
-The source clip is `public/input.mp4` and the composition is `1080x1920`
+The source clip is `public/input.mp4` and both compositions are `1080x1920`
 (vertical), 30fps — change these in [`src/Root.tsx`](src/Root.tsx).
 
 ### Rendering in a restricted/sandboxed environment
@@ -67,15 +113,12 @@ Remotion normally downloads its own headless Chromium. If outbound access to
 `chrome-headless-shell` binary:
 
 ```bash
-npx remotion render SelectiveDesaturation out/video.mp4 \
+npx remotion render ColorGrade out/colorgrade.mp4 \
   --browser-executable=/path/to/chrome-headless-shell
 ```
 
-## How it works (implementation note)
-
-During rendering, `<ThreeCanvas>` runs with `frameloop="never"` and only draws
-the scene when the frame number changes. The off-thread video texture, however,
-resolves **asynchronously** after that draw, so `ShaderPlane` calls
-`useThree().advance()` once the texture is in place to force a redraw before
-Remotion captures the frame. Without this the shader would sample an empty
-texture and render black.
+Note: the `<Video>` tag requires the browser itself to decode H.264, which a
+stock headless-shell build may not support — both compositions here use
+`<OffthreadVideo>` / `useOffthreadVideoTexture()`, which decode frames via
+Remotion's bundled FFmpeg instead and work regardless of browser codec
+support.
