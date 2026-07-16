@@ -7,8 +7,10 @@ import {
 import { ColorGrade, defaultColorGradeProps } from "./ColorGrade";
 import { ForegroundPop, defaultForegroundPopProps } from "./ForegroundPop";
 import { DuotonePop, defaultDuotonePopProps } from "./DuotonePop";
+import { BeatEffects, BeatEvent } from "./BeatEffects";
 import backgroundHues1 from "./data/scene-colors.json";
 import backgroundHues2 from "./data/scene-colors2.json";
+import editBeats from "./data/beatEffects.json";
 
 // Source video lives in public/ and is referenced via staticFile() inside the
 // component. The 4K portrait source is sampled down into this 1080x1920 output.
@@ -25,6 +27,12 @@ const DURATION_IN_FRAMES = 216; // ~7.2s at 30fps
 const VIDEO_SRC_2 = "input2.mp4";
 const MASK_SRC_2 = "mask2.mp4";
 const DURATION_IN_FRAMES_2 = 370; // ~12.3s at 30fps
+
+// Uploaded, already-cut absurd-clips edit — beat-synced zoom/stretch/glitch
+// pass. Source is 4K portrait (2160x3840), same 9:16 as the render size, so
+// it just gets sampled down like the others.
+const EDIT_SRC = "edit.mp4";
+const EDIT_DURATION_IN_FRAMES = 370; // 12.35s at 30fps
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -92,6 +100,18 @@ export const RemotionRoot: React.FC = () => {
           src: VIDEO_SRC_2,
           maskSrc: MASK_SRC_2,
           ...defaultDuotonePopProps,
+        }}
+      />
+      <Composition
+        id="BeatEffects"
+        component={BeatEffects}
+        durationInFrames={EDIT_DURATION_IN_FRAMES}
+        fps={FPS}
+        width={WIDTH}
+        height={HEIGHT}
+        defaultProps={{
+          src: EDIT_SRC,
+          beats: editBeats as BeatEvent[],
         }}
       />
     </>
