@@ -65,6 +65,8 @@ export type ClipCaption = {
 
 export type BeatEffectsProps = {
   src: string;
+  /** Total frame count of the source video — drives the composition's duration via calculateMetadata. */
+  totalFrames: number;
   beats: BeatEvent[];
   clips: ClipCaption[];
 };

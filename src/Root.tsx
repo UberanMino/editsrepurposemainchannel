@@ -103,18 +103,30 @@ export const RemotionRoot: React.FC = () => {
           ...defaultDuotonePopProps,
         }}
       />
+      {/*
+        Batch pipeline entry point (scripts/process-video.sh): each video
+        gets rendered with `--props=src/data/props/<project>.json`, which
+        fully overrides defaultProps below (only used for Studio preview of
+        this one example). calculateMetadata reads totalFrames from
+        whichever props actually got passed in, so durationInFrames adapts
+        per video instead of being pinned to this example's length.
+      */}
       <Composition
         id="BeatEffects"
         component={BeatEffects}
-        durationInFrames={EDIT_DURATION_IN_FRAMES}
         fps={FPS}
         width={WIDTH}
         height={HEIGHT}
+        durationInFrames={EDIT_DURATION_IN_FRAMES}
         defaultProps={{
           src: EDIT_SRC,
+          totalFrames: EDIT_DURATION_IN_FRAMES,
           beats: editBeats as BeatEvent[],
           clips: editClips as ClipCaption[],
         }}
+        calculateMetadata={async ({ props }) => ({
+          durationInFrames: props.totalFrames,
+        })}
       />
     </>
   );
