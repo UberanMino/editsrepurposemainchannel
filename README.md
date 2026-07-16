@@ -1,7 +1,8 @@
 # Video Color Effects (Remotion)
 
-Three [Remotion](https://www.remotion.dev/) compositions built on the same
-source clip (`public/input.mp4`):
+Four [Remotion](https://www.remotion.dev/) compositions, three of them built
+on `public/input.mp4` and a second source clip (`public/input2.mp4`) wired up
+as a fourth, `ForegroundPopV2`:
 
 - **`SelectiveDesaturation`** — a GLSL shader (via `@remotion/three`) that
   turns the video black & white except for a configurable hue range.
@@ -119,15 +120,18 @@ one side:
   ripple so it feels like a distinct moving field behind the crisp subject.
 
 ```ts
+// Each multiplier's departure from "neutral" (1, or 0 for the two strength
+// knobs) is dialed to ~25% of a much stronger first pass — see the numbers
+// in parens for what "full strength" looked like.
 export const defaultForegroundPopProps = {
-  foregroundSaturation: 1.25, // >1 = subject more vivid
-  foregroundBrightness: 1.08, // >1 = subject brighter
-  backgroundSaturation: 1.15, // >1 = background vivid too, not muted
-  backgroundBrightness: 0.92, // <1 = very slightly dimmer, keeps subject primary
-  backgroundColorizeStrength: 0.8, // 0 = background keeps its own hue, 1 = fully replaced
-  liquifyAmount: 0.012, // ripple displacement, in UV units
-  liquifyScale: 8,      // ripple frequency
-  liquifySpeed: 0.8,    // ripple animation speed
+  foregroundSaturation: 1.06, // >1 = subject more vivid (full strength: 1.25)
+  foregroundBrightness: 1.02, // >1 = subject brighter (full strength: 1.08)
+  backgroundSaturation: 1.04, // >1 = background vivid too, not muted (full strength: 1.15)
+  backgroundBrightness: 0.98, // <1 = very slightly dimmer, keeps subject primary (full strength: 0.92)
+  backgroundColorizeStrength: 0.2, // 0 = background keeps its own hue, 1 = fully replaced (full strength: 0.8)
+  liquifyAmount: 0.003, // ripple displacement, in UV units (full strength: 0.012)
+  liquifyScale: 8,      // ripple frequency — a pattern-shape knob, not scaled down
+  liquifySpeed: 0.8,    // ripple animation speed — also not scaled down
 };
 ```
 
@@ -136,12 +140,14 @@ hardcoded: `scripts/generate-mask.js` samples the dominant hue of the
 foreground region in every frame (weighted circular mean, ignoring near-gray
 pixels so it isn't thrown off by skin/shadow noise), smooths that sequence
 over time so it doesn't flicker, and writes the complementary hue (+180°) for
-every frame to [`src/data/scene-colors.json`](src/data/scene-colors.json).
-`ForegroundPop.tsx` looks up that frame's value with `useCurrentFrame()` and
-feeds it to the shader as `uBackgroundTargetHue`. So a pink outfit pushes the
-background toward green, a blue one toward orange, and so on, automatically —
-if the subject's color changes partway through a shot, the background target
-hue drifts with it.
+every frame to a `scene-colors*.json` file under
+[`src/data/`](src/data). `ForegroundPop.tsx` takes that per-frame array as
+its `backgroundHues` prop (looked up by `useCurrentFrame()` and fed to the
+shader as `uBackgroundTargetHue`) rather than importing a fixed file itself —
+`Root.tsx` is what wires each composition to its own video's color data. So a
+pink outfit pushes the background toward green, a blue one toward orange, and
+so on, automatically — if the subject's color changes partway through a shot,
+the background target hue drifts with it.
 
 - **More/less dramatic recolor?** Change `backgroundColorizeStrength` (0 = off).
 - **Stronger/subtler liquify?** Change `liquifyAmount` (displacement) and
@@ -149,20 +155,37 @@ hue drifts with it.
 - **Rebalance which region reads as "primary"?** Nudge `backgroundBrightness`
   down (recedes) or up toward `foregroundBrightness` (equal footing).
 
-**Regenerating the matte + scene colors:** if you swap in a different source
-video (or change its resolution/fps/duration in `src/Root.tsx`), re-run:
+**Adding another source video / regenerating the matte + scene colors:**
+`scripts/generate-mask.js` takes CLI flags rather than being hardcoded to
+`input.mp4`, so the same script handles every clip — this is exactly how
+`input2.mp4` / `ForegroundPopV2` were added:
 
 ```bash
-npm run generate-mask
+node scripts/generate-mask.js \
+  --input=public/yourClip.mp4 \
+  --mask-out=public/yourClipMask.mp4 \
+  --colors-out=src/data/yourClipColors.json \
+  --frames=<frame count at 30fps>
+# --width/--height default to 1080x1920, --fps defaults to 30 — pass them too
+# if your composition uses different values (see src/Root.tsx).
 ```
 
-This extracts every frame via Remotion's bundled ffmpeg, runs MediaPipe
-Selfie Segmentation on each one through a headless Chromium instance (driven
-by Playwright — the model needs a real WebGL+WASM browser context, unlike the
-video textures elsewhere in this repo), computes each frame's dominant-hue
-estimate on a downsampled canvas in the same browser pass, and writes
-`public/mask.mp4` + `src/data/scene-colors.json`. Takes a few minutes for a
-~200 frame clip.
+(`npm run generate-mask` with no arguments re-runs the original `input.mp4` →
+`public/mask.mp4` / `src/data/scene-colors.json` pipeline.)
+
+Then in `src/Root.tsx`: import the new `scene-colors*.json`, and register a
+new `<Composition>` using the `ForegroundPop` component with that video's
+`src`, `maskSrc`, and `backgroundHues` (see the existing `ForegroundPopV2`
+entry as a template) — `defaultForegroundPopProps` can be reused as-is or
+overridden per composition.
+
+Under the hood, the script extracts every frame via Remotion's bundled
+ffmpeg, runs MediaPipe Selfie Segmentation on each one through a headless
+Chromium instance (driven by Playwright — the model needs a real WebGL+WASM
+browser context, unlike the video textures elsewhere in this repo), computes
+each frame's dominant-hue estimate on a downsampled canvas in the same
+browser pass, and writes the mask video + scene-colors JSON. Takes a few
+minutes per ~200 frames.
 
 **Known limitations:**
 - MediaPipe's segmenter detects *people*, not arbitrary subjects — a shot with
@@ -183,18 +206,21 @@ npm install
 # Interactive studio (tweak props live)
 npm run dev
 
-# One-time: generate public/mask.mp4 for ForegroundPop (already committed
-# for the bundled input.mp4, only needed again if you change the source video)
+# One-time: generate public/mask.mp4 + src/data/scene-colors.json for
+# ForegroundPop (already committed for the bundled input.mp4 and input2.mp4,
+# only needed again if you change/add a source video — see above)
 npm run generate-mask
 
 # Render any composition
 npx remotion render SelectiveDesaturation out/desaturation.mp4
 npx remotion render ColorGrade out/colorgrade.mp4
 npx remotion render ForegroundPop out/foregroundpop.mp4
+npx remotion render ForegroundPopV2 out/foregroundpop-v2.mp4
 ```
 
-The source clip is `public/input.mp4` and both compositions are `1080x1920`
-(vertical), 30fps — change these in [`src/Root.tsx`](src/Root.tsx).
+All compositions render at `1080x1920` (vertical), 30fps, regardless of the
+source clip's own resolution — change any of this in
+[`src/Root.tsx`](src/Root.tsx).
 
 ### Rendering in a restricted/sandboxed environment
 

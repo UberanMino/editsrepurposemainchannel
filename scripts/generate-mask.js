@@ -16,13 +16,33 @@
  * contrast adapts to whatever the subject is actually wearing/colored like
  * in that shot, instead of a fixed hue.
  *
- * Usage: node scripts/generate-mask.js
+ * Usage:
+ *   node scripts/generate-mask.js
+ *   node scripts/generate-mask.js --input=public/input2.mp4 \
+ *     --mask-out=public/mask2.mp4 --colors-out=src/data/scene-colors2.json \
+ *     --frames=370
+ *
+ * All flags are optional and default to the original input.mp4 pipeline.
+ * --width/--height default to the composition's 1080x1920 output size (the
+ * source is scaled down to this during frame extraction); --frames defaults
+ * to 216 (the original clip's frame count at 30fps) — pass the real frame
+ * count for a differently-timed source video.
  */
 const fs = require("fs");
 const path = require("path");
 const http = require("http");
 const { execFileSync } = require("child_process");
 const { chromium } = require("playwright");
+
+function parseArgs() {
+  const args = {};
+  for (const arg of process.argv.slice(2)) {
+    const m = arg.match(/^--([^=]+)=(.*)$/);
+    if (m) args[m[1]] = m[2];
+  }
+  return args;
+}
+const argv = parseArgs();
 
 const ROOT = path.join(__dirname, "..");
 const FFMPEG = path.join(
@@ -31,18 +51,24 @@ const FFMPEG = path.join(
 );
 const CHROME_EXECUTABLE = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
 const MP_DIR = path.join(ROOT, "node_modules/@mediapipe/selfie_segmentation");
-const INPUT = path.join(ROOT, "public/input.mp4");
-const OUTPUT_MASK = path.join(ROOT, "public/mask.mp4");
-const OUTPUT_COLORS = path.join(ROOT, "src/data/scene-colors.json");
-const SCRATCH = path.join(ROOT, ".mask-scratch");
+const INPUT = path.join(ROOT, argv.input || "public/input.mp4");
+const OUTPUT_MASK = path.join(ROOT, argv["mask-out"] || "public/mask.mp4");
+const OUTPUT_COLORS = path.join(
+  ROOT,
+  argv["colors-out"] || "src/data/scene-colors.json",
+);
+const SCRATCH = path.join(
+  ROOT,
+  argv.scratch || ".mask-scratch",
+);
 const FRAMES_DIR = path.join(SCRATCH, "frames");
 const MASKS_DIR = path.join(SCRATCH, "masks");
 
-const WIDTH = 1080;
-const HEIGHT = 1920;
-const FPS = 30;
-const FRAME_COUNT = 216;
-const MP_SERVER_PORT = 8934;
+const WIDTH = Number(argv.width || 1080);
+const HEIGHT = Number(argv.height || 1920);
+const FPS = Number(argv.fps || 30);
+const FRAME_COUNT = Number(argv.frames || 216);
+const MP_SERVER_PORT = Number(argv.port || 8934);
 
 // Downsampled canvas used only for the per-frame dominant-hue estimate —
 // full resolution isn't needed for a color average and would be much slower
