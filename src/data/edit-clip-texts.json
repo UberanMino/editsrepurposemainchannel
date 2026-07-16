@@ -4,83 +4,83 @@
     "text": "EVERYTHING IS A DOOR IF YOU BELIEVE HARD ENOUGH",
     "corner": "top-right",
     "rotationDeg": -2.4,
-    "fontSizePx": 26
+    "fontSizePx": 32
   },
   {
     "clipIndex": 1,
     "text": "TUBBY TOAST FOREVER",
     "corner": "bottom-right",
     "rotationDeg": -1.3,
-    "fontSizePx": 30
+    "fontSizePx": 37
   },
   {
     "clipIndex": 2,
     "text": "SOMEBODY TELL DAVE IT'S OVER",
     "corner": "bottom-left",
     "rotationDeg": 2.5,
-    "fontSizePx": 29
+    "fontSizePx": 37
   },
   {
     "clipIndex": 3,
     "text": "A PIGEON IS RUNNING THIS NOW",
     "corner": "bottom-right",
     "rotationDeg": 1.2,
-    "fontSizePx": 32
+    "fontSizePx": 36
   },
   {
     "clipIndex": 4,
     "text": "I'VE MADE A HUGE MISTAKE AND HER NAME WAS KAREN",
     "corner": "top-right",
     "rotationDeg": 2.3,
-    "fontSizePx": 25
+    "fontSizePx": 34
   },
   {
     "clipIndex": 5,
     "text": "TIME FOR TUBBY BYE BYE",
     "corner": "bottom-right",
     "rotationDeg": 0.3,
-    "fontSizePx": 32
+    "fontSizePx": 36
   },
   {
     "clipIndex": 6,
     "text": "THIS WAS FORETOLD, KIND OF",
     "corner": "top-right",
     "rotationDeg": -1.9,
-    "fontSizePx": 29
+    "fontSizePx": 38
   },
   {
     "clipIndex": 7,
     "text": "SEVERAL BIRDS ARE INVOLVED",
     "corner": "top-left",
     "rotationDeg": -2.6,
-    "fontSizePx": 30
+    "fontSizePx": 39
   },
   {
     "clipIndex": 8,
     "text": "I found a second kitchen behind the first kitchen and I've decided not to tell anyone.",
     "corner": "top-right",
     "rotationDeg": -1.9,
-    "fontSizePx": 23
+    "fontSizePx": 28
   },
   {
     "clipIndex": 9,
     "text": "They renamed the street after someone who isn't dead yet and he's furious about it.",
     "corner": "top-left",
     "rotationDeg": -2.9,
-    "fontSizePx": 22
+    "fontSizePx": 30
   },
   {
     "clipIndex": 10,
     "text": "The instructions said to add water and step back, and I've been stepping back ever since.",
     "corner": "bottom-left",
     "rotationDeg": 0.8,
-    "fontSizePx": 24
+    "fontSizePx": 30
   },
   {
     "clipIndex": 11,
     "text": "THE STAIRS GO SOMEWHERE ELSE TODAY",
     "corner": "bottom-right",
     "rotationDeg": -2.4,
-    "fontSizePx": 29
+    "fontSizePx": 40
   }
 ]

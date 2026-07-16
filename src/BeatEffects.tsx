@@ -1,10 +1,32 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   AbsoluteFill,
   OffthreadVideo,
+  continueRender,
+  delayRender,
   staticFile,
   useCurrentFrame,
 } from "remotion";
+
+const CAPTION_FONT_FAMILY = "VT323RetroCaption";
+
+/** Loads the local VHS/CRT-style caption font before the frame is captured. */
+const useCaptionFont = () => {
+  const [handle] = useState(() => delayRender("Loading caption font"));
+  useEffect(() => {
+    const font = new FontFace(
+      CAPTION_FONT_FAMILY,
+      `url(${staticFile("fonts/VT323-Regular.woff2")}) format("woff2")`
+    );
+    font
+      .load()
+      .then((loaded) => {
+        document.fonts.add(loaded);
+        continueRender(handle);
+      })
+      .catch(() => continueRender(handle));
+  }, [handle]);
+};
 
 export type BeatEffectType =
   | "horizontalStretch"
@@ -47,14 +69,34 @@ export type BeatEffectsProps = {
   clips: ClipCaption[];
 };
 
-const CAPTION_POP_FRAMES = 5;
+// Entrance + drift timing for captions. Unlike the beat effects (hard snap),
+// captions are asked to flow in smoothly and glide gently across the frame.
+const CAPTION_ENTRY_FRAMES = 16;
+const CAPTION_DRIFT_PX = 26;
 
+// Kept well clear of TikTok/Reels/Shorts chrome: the right edge is reserved
+// for the like/comment/share icon stack and the bottom ~20% for the
+// caption/sound/follow bar, so captions sit further inboard than a plain
+// "corner" placement would.
 const CORNER_STYLE: Record<ClipCorner, React.CSSProperties> = {
-  "top-left": { top: "6%", left: "6%" },
-  "top-right": { top: "6%", right: "6%", textAlign: "right" },
-  "bottom-left": { bottom: "8%", left: "6%" },
-  "bottom-right": { bottom: "8%", right: "6%", textAlign: "right" },
+  "top-left": { top: "12%", left: "9%" },
+  "top-right": { top: "12%", right: "16%", textAlign: "right" },
+  "bottom-left": { bottom: "22%", left: "9%" },
+  "bottom-right": { bottom: "22%", right: "16%", textAlign: "right" },
 };
+
+// Unit vector each corner's caption slowly glides toward, so it reads as
+// drifting further into frame rather than sitting static.
+const CORNER_DRIFT: Record<ClipCorner, { x: number; y: number }> = {
+  "top-left": { x: 1, y: 0.4 },
+  "top-right": { x: -1, y: 0.4 },
+  "bottom-left": { x: 1, y: -0.4 },
+  "bottom-right": { x: -1, y: -0.4 },
+};
+
+const easeOutCubic = (x: number) => 1 - Math.pow(1 - x, 3);
+const easeInOutQuad = (x: number) =>
+  x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
 
 const findActiveClip = (
   frame: number,
@@ -112,6 +154,7 @@ export const BeatEffects: React.FC<BeatEffectsProps> = ({
   beats,
   clips,
 }) => {
+  useCaptionFont();
   const frame = useCurrentFrame();
   const resolvedSrc = src.startsWith("http") ? src : staticFile(src);
 
@@ -223,29 +266,43 @@ export const BeatEffects: React.FC<BeatEffectsProps> = ({
   let captionNode: React.ReactNode = null;
   if (activeClip) {
     const t = frame - activeClip.startFrame;
-    const popProgress = Math.min(1, t / CAPTION_POP_FRAMES);
-    // hard pop-in (not a linear fade), same "abrupt attack" language as the
-    // beat effects: snap most of the way in immediately, ease the last bit.
-    const eased = 1 - Math.pow(1 - popProgress, 3);
-    const opacity = t <= 0 ? 0 : Math.min(1, 0.4 + eased * 0.6) * 0.88;
-    const scale = 0.85 + eased * 0.15;
+    const clipLen = Math.max(1, activeClip.endFrame - activeClip.startFrame);
+    const drift = CORNER_DRIFT[activeClip.corner];
+
+    // Smooth flow-in: fades and slides up from a slight offset, easing out
+    // rather than snapping (captions are the one thing here that should
+    // feel gentle, in contrast to the hard-cut beat effects on the video).
+    const entryProgress = Math.min(1, Math.max(0, t) / CAPTION_ENTRY_FRAMES);
+    const entryEase = easeOutCubic(entryProgress);
+    const opacity = (t <= 0 ? 0 : entryEase) * 0.82;
+    const scale = 0.94 + entryEase * 0.06;
+
+    // Slow continuous glide across the screen for the life of the clip, so
+    // the text is never quite static.
+    const driftProgress = easeInOutQuad(Math.min(1, Math.max(0, t) / clipLen));
+    const driftX = drift.x * CAPTION_DRIFT_PX * driftProgress;
+    const driftY = drift.y * CAPTION_DRIFT_PX * driftProgress;
+    const entrySlideY = (1 - entryEase) * 18;
 
     captionNode = (
       <div
         style={{
           position: "absolute",
           ...CORNER_STYLE[activeClip.corner],
-          maxWidth: "46%",
-          fontFamily: "'Courier New', Courier, monospace",
-          fontWeight: 600,
-          letterSpacing: "0.02em",
-          lineHeight: 1.3,
+          maxWidth: "44%",
+          fontFamily: `${CAPTION_FONT_FAMILY}, 'Courier New', monospace`,
+          fontWeight: 400,
+          letterSpacing: "0.05em",
+          lineHeight: 1.15,
           fontSize: activeClip.fontSizePx,
-          color: "rgba(255,255,255,0.85)",
-          textShadow: "0 0 3px rgba(0,0,0,0.4)",
-          mixBlendMode: "overlay",
+          color: "rgba(255,246,224,0.92)",
+          textShadow:
+            "0 0 4px rgba(255,244,214,0.85), 0 0 11px rgba(255,205,120,0.55), 0 0 22px rgba(255,170,80,0.35), 0 0 2px rgba(0,0,0,0.5)",
+          mixBlendMode: "screen",
           opacity,
-          transform: `rotate(${activeClip.rotationDeg}deg) scale(${scale})`,
+          transform: `translate(${driftX}px, ${
+            driftY + entrySlideY
+          }px) rotate(${activeClip.rotationDeg}deg) scale(${scale})`,
           transformOrigin:
             activeClip.corner === "top-left" ||
             activeClip.corner === "bottom-left"

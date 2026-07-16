@@ -72,9 +72,11 @@ const clipAssignments = chosen.map((entry, i) => {
   bankEntry.lastUsedInProject = projectName;
 
   // longer sentence-style lines get a smaller size so they still read as a
-  // tucked-away note rather than a subtitle block
+  // tucked-away note rather than a subtitle block. VT323 is a pixel font
+  // that renders visually smaller than its px value vs. a normal typeface,
+  // so these run a bit bigger than they would for a regular font.
   const baseSize =
-    entry.text.length > 60 ? 20 : entry.text.length > 35 ? 24 : 28;
+    entry.text.length > 60 ? 26 : entry.text.length > 35 ? 31 : 36;
 
   return {
     clipIndex: i,
