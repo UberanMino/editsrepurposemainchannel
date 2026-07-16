@@ -89,6 +89,7 @@ export const RemotionRoot: React.FC = () => {
         width={WIDTH}
         height={HEIGHT}
         defaultProps={{
+          src: VIDEO_SRC_2,
           maskSrc: MASK_SRC_2,
           ...defaultDuotonePopProps,
         }}

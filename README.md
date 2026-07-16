@@ -212,27 +212,31 @@ minutes per ~200 frames.
 
 ## `DuotonePop`
 
-No grading at all — the color video isn't even sampled. Every pixel becomes
-one of exactly two flat colors, chosen by the same segmentation matte the
-other compositions use ([`src/duotonePopShader.ts`](src/duotonePopShader.ts)
-just mixes between two constants by the mask value):
+A flat, graphic "cutout" look: the background renders as one solid color; the
+foreground can be either the subject's real, untouched video (the default —
+no grading at all) or another flat color for a true two-tone look. Either
+way, [`src/duotonePopShader.ts`](src/duotonePopShader.ts) decides purely by
+the same segmentation matte the other compositions use — no shading, no
+feathering beyond what the matte already has, no liquify, on purpose, since
+the point here is a clean, simple cutout rather than a graded look.
 
 ```ts
 export const defaultDuotonePopProps = {
-  foregroundColor: "#FF0000", // subject
-  backgroundColor: "#FFFFFF", // everything else
+  foregroundColor: "original", // keep the subject's real video colors...
+  backgroundColor: "#FFFFFF",  // ...cut out against flat white
 };
 ```
 
-Both are plain CSS hex strings — set them to anything. The matte's existing
-antialiased edge is what keeps the silhouette from looking jagged; there's no
-additional feathering or liquify, on purpose, since the point here is a
-clean, simple contrast rather than a graded look.
+- **Keep the original subject, recolor the background:** leave
+  `foregroundColor: "original"` (the default) and change `backgroundColor` to
+  any CSS hex string.
+- **True flat two-tone (e.g. solid red subject on solid white):** set
+  `foregroundColor` to a hex string too, e.g. `"#FF0000"`.
 
 Currently only wired up for the second source video, as `DuotonePop` in
-`src/Root.tsx` (reuses `public/mask2.mp4`) — add a `maskSrc: MASK_SRC` /
-`backgroundHues`-free entry the same way if you want it on the first video
-too.
+`src/Root.tsx` (reuses `public/input2.mp4` / `public/mask2.mp4`) — add a
+similar entry using `VIDEO_SRC` / `MASK_SRC` if you want it on the first
+video too.
 
 ## Run it
 
