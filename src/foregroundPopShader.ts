@@ -7,18 +7,12 @@
  * its matching foreground matte — and renders two different grades of the
  * same pixel, blended by the (feathered) mask value:
  *
- *   - foreground: boosted saturation + brightness (multiplicative), subject
- *     stays sharp.
- *   - background: hue, saturation AND brightness are each blended TOWARD A
- *     FIXED TARGET (a light sky-blue look) by uBackgroundColorizeStrength —
- *     not multiplied by the pixel's own values. That's deliberate: a
- *     multiplicative grade looks wildly different clip to clip, because it
- *     scales whatever saturation/brightness the source happened to have
- *     (barely-there on flat/dark footage, blown-out on already-vivid
- *     footage). Blending toward a fixed target instead makes every clip
- *     converge on the same look at the same strength. The background is
- *     also gently liquified (UV-warped) so it reads as a distinct, moving
- *     field behind the crisp subject.
+ *   - foreground: boosted saturation + brightness, subject stays sharp.
+ *   - background: recolored toward a per-frame complementary hue (computed
+ *     ahead of time from the actual foreground color of that frame — see
+ *     scripts/generate-mask.js's scene-colors.json output), ALSO boosted in
+ *     saturation, and gently liquified (UV-warped) so it reads as a distinct,
+ *     moving field behind the crisp subject rather than a flat backdrop.
  */
 
 export const vertexShader = /* glsl */ `
@@ -42,14 +36,14 @@ export const fragmentShader = /* glsl */ `
   // --- Grade controls (all driven from props, see ForegroundPop.tsx) ---
   uniform float uForegroundSaturation; // multiplier on foreground saturation, >1 = more vivid
   uniform float uForegroundBrightness; // multiplier on foreground brightness (HSV value)
+  uniform float uBackgroundSaturation; // multiplier on background saturation, >1 = more vivid too
+  uniform float uBackgroundBrightness; // multiplier on background brightness (HSV value)
 
-  // Fixed "sky" target the background's hue/saturation/brightness are each
-  // blended toward (see uBackgroundColorizeStrength), instead of scaled from
-  // whatever the source pixel happened to be.
-  uniform float uBackgroundTargetHue;        // degrees, ~200-210 = cyan-blue
-  uniform float uBackgroundTargetSaturation; // 0..1, kept low/moderate for a "light" sky
-  uniform float uBackgroundTargetBrightness; // 0..1, kept high for an airy look
-  uniform float uBackgroundColorizeStrength; // 0 = leave background alone, 1 = fully replace with target
+  // Per-frame complementary hue (degrees) computed from the ACTUAL dominant
+  // foreground color of this shot, and how strongly to pull the background's
+  // own hue toward it (0 = leave background hue alone, 1 = fully replace it).
+  uniform float uBackgroundTargetHue;
+  uniform float uBackgroundColorizeStrength;
 
   // Liquify: a gentle animated UV warp applied only to the background sample,
   // so it reads as fluid/moving behind the crisp, undistorted subject.
@@ -120,9 +114,11 @@ export const fragmentShader = /* glsl */ `
 
     vec3 hsvBg = rgb2hsv(rgbLiquid);
     float bgHueDeg = mixHueDeg(hsvBg.x * 360.0, uBackgroundTargetHue, uBackgroundColorizeStrength);
-    float bgSat = mix(hsvBg.y, uBackgroundTargetSaturation, uBackgroundColorizeStrength);
-    float bgVal = mix(hsvBg.z, uBackgroundTargetBrightness, uBackgroundColorizeStrength);
-    vec3 bgHsv = vec3(bgHueDeg / 360.0, clamp(bgSat, 0.0, 1.0), clamp(bgVal, 0.0, 1.0));
+    vec3 bgHsv = vec3(
+      bgHueDeg / 360.0,
+      clamp(hsvBg.y * uBackgroundSaturation, 0.0, 1.0),
+      clamp(hsvBg.z * uBackgroundBrightness, 0.0, 1.0)
+    );
 
     vec3 fgRgb = hsv2rgb(fgHsv);
     vec3 bgRgb = hsv2rgb(bgHsv);
