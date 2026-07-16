@@ -1,8 +1,8 @@
 # Video Color Effects (Remotion)
 
-Four [Remotion](https://www.remotion.dev/) compositions, three of them built
-on `public/input.mp4` and a second source clip (`public/input2.mp4`) wired up
-as a fourth, `ForegroundPopV2`:
+Five [Remotion](https://www.remotion.dev/) compositions, built on
+`public/input.mp4` and a second source clip (`public/input2.mp4`), the latter
+wired up as `ForegroundPopV2` and `DuotonePop`:
 
 - **`SelectiveDesaturation`** — a GLSL shader (via `@remotion/three`) that
   turns the video black & white except for a configurable hue range.
@@ -12,6 +12,9 @@ as a fourth, `ForegroundPopV2`:
   and vivid, and recolors the background toward a per-frame **complementary**
   hue (also vivid, plus a gentle liquid warp) using a precomputed
   **person-segmentation matte** rather than a color-based mask.
+- **`DuotonePop`** — the simplest one: flat solid colors, no grading. The
+  foreground subject is one solid color, the background another (red on
+  white by default), using the same segmentation matte.
 
 ## `SelectiveDesaturation`
 
@@ -207,6 +210,30 @@ minutes per ~200 frames.
   of the foreground's, which is more noticeable now that the background is a
   strongly contrasting hue rather than just muted.
 
+## `DuotonePop`
+
+No grading at all — the color video isn't even sampled. Every pixel becomes
+one of exactly two flat colors, chosen by the same segmentation matte the
+other compositions use ([`src/duotonePopShader.ts`](src/duotonePopShader.ts)
+just mixes between two constants by the mask value):
+
+```ts
+export const defaultDuotonePopProps = {
+  foregroundColor: "#FF0000", // subject
+  backgroundColor: "#FFFFFF", // everything else
+};
+```
+
+Both are plain CSS hex strings — set them to anything. The matte's existing
+antialiased edge is what keeps the silhouette from looking jagged; there's no
+additional feathering or liquify, on purpose, since the point here is a
+clean, simple contrast rather than a graded look.
+
+Currently only wired up for the second source video, as `DuotonePop` in
+`src/Root.tsx` (reuses `public/mask2.mp4`) — add a `maskSrc: MASK_SRC` /
+`backgroundHues`-free entry the same way if you want it on the first video
+too.
+
 ## Run it
 
 ```bash
@@ -225,6 +252,7 @@ npx remotion render SelectiveDesaturation out/desaturation.mp4
 npx remotion render ColorGrade out/colorgrade.mp4
 npx remotion render ForegroundPop out/foregroundpop.mp4
 npx remotion render ForegroundPopV2 out/foregroundpop-v2.mp4
+npx remotion render DuotonePop out/duotonepop.mp4
 ```
 
 All compositions render at `1080x1920` (vertical), 30fps, regardless of the

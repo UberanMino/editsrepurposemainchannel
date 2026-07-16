@@ -6,6 +6,7 @@ import {
 } from "./SelectiveDesaturation";
 import { ColorGrade, defaultColorGradeProps } from "./ColorGrade";
 import { ForegroundPop, defaultForegroundPopProps } from "./ForegroundPop";
+import { DuotonePop, defaultDuotonePopProps } from "./DuotonePop";
 import backgroundHues1 from "./data/scene-colors.json";
 import backgroundHues2 from "./data/scene-colors2.json";
 
@@ -78,6 +79,18 @@ export const RemotionRoot: React.FC = () => {
           maskSrc: MASK_SRC_2,
           backgroundHues: backgroundHues2 as number[],
           ...defaultForegroundPopProps,
+        }}
+      />
+      <Composition
+        id="DuotonePop"
+        component={DuotonePop}
+        durationInFrames={DURATION_IN_FRAMES_2}
+        fps={FPS}
+        width={WIDTH}
+        height={HEIGHT}
+        defaultProps={{
+          maskSrc: MASK_SRC_2,
+          ...defaultDuotonePopProps,
         }}
       />
     </>
