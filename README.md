@@ -7,9 +7,10 @@ source clip (`public/input.mp4`):
   turns the video black & white except for a configurable hue range.
 - **`ColorGrade`** — a plain CSS-filter grade: boosted saturation + contrast,
   with the hue rotating continuously over the clip.
-- **`ForegroundPop`** — a GLSL shader that boosts saturation/brightness on the
-  foreground subject and mutes (not fully desaturates) the background, using a
-  precomputed **person-segmentation matte** rather than a color-based mask.
+- **`ForegroundPop`** — a GLSL shader that keeps the foreground subject sharp
+  and vivid, and recolors the background toward a per-frame **complementary**
+  hue (also vivid, plus a gentle liquid warp) using a precomputed
+  **person-segmentation matte** rather than a color-based mask.
 
 ## `SelectiveDesaturation`
 
@@ -104,23 +105,52 @@ generates a soft foreground alpha matte for every frame ahead of time
 [`src/foregroundPopShader.ts`](src/foregroundPopShader.ts) reads that matte
 alongside the color video to grade the two regions differently — effectively
 the "two layers, two color filters" idea, composited by an alpha mask instead
-of literally cut into two clips:
+of literally cut into two clips.
+
+Both regions stay vivid — the contrast comes from *color*, not from muting
+one side:
+
+- **Foreground** stays pixel-sharp and gets a saturation/brightness boost.
+  Its hue is never touched.
+- **Background** gets boosted too, but its hue is pulled toward the
+  **complementary** color of the foreground's own dominant hue — the exact
+  opposite side of the color wheel, so it reads as a clearly different, but
+  still harmonious, color. It's also gently **liquified**: an animated UV
+  ripple so it feels like a distinct moving field behind the crisp subject.
 
 ```ts
 export const defaultForegroundPopProps = {
   foregroundSaturation: 1.25, // >1 = subject more vivid
   foregroundBrightness: 1.08, // >1 = subject brighter
-  backgroundSaturation: 0.35, // <1 = muted, but NOT 0 (never fully gray)
-  backgroundBrightness: 0.8,  // <1 = slightly dimmed, pushes focus to subject
+  backgroundSaturation: 1.15, // >1 = background vivid too, not muted
+  backgroundBrightness: 0.92, // <1 = very slightly dimmer, keeps subject primary
+  backgroundColorizeStrength: 0.8, // 0 = background keeps its own hue, 1 = fully replaced
+  liquifyAmount: 0.012, // ripple displacement, in UV units
+  liquifyScale: 8,      // ripple frequency
+  liquifySpeed: 0.8,    // ripple animation speed
 };
 ```
 
-All four are per-channel multipliers on the pixel's HSV saturation/value — hue
-is never touched, only how vivid/bright it reads. Tune `backgroundSaturation`
-down toward 0 for a more dramatic pop, or up toward 1 for a subtler grade.
+**Which color does the background become?** This is computed per frame, not
+hardcoded: `scripts/generate-mask.js` samples the dominant hue of the
+foreground region in every frame (weighted circular mean, ignoring near-gray
+pixels so it isn't thrown off by skin/shadow noise), smooths that sequence
+over time so it doesn't flicker, and writes the complementary hue (+180°) for
+every frame to [`src/data/scene-colors.json`](src/data/scene-colors.json).
+`ForegroundPop.tsx` looks up that frame's value with `useCurrentFrame()` and
+feeds it to the shader as `uBackgroundTargetHue`. So a pink outfit pushes the
+background toward green, a blue one toward orange, and so on, automatically —
+if the subject's color changes partway through a shot, the background target
+hue drifts with it.
 
-**Regenerating the matte:** if you swap in a different source video (or
-change its resolution/fps/duration in `src/Root.tsx`), re-run:
+- **More/less dramatic recolor?** Change `backgroundColorizeStrength` (0 = off).
+- **Stronger/subtler liquify?** Change `liquifyAmount` (displacement) and
+  `liquifyScale` (ripple size); `liquifySpeed` controls how fast it moves.
+- **Rebalance which region reads as "primary"?** Nudge `backgroundBrightness`
+  down (recedes) or up toward `foregroundBrightness` (equal footing).
+
+**Regenerating the matte + scene colors:** if you swap in a different source
+video (or change its resolution/fps/duration in `src/Root.tsx`), re-run:
 
 ```bash
 npm run generate-mask
@@ -129,14 +159,21 @@ npm run generate-mask
 This extracts every frame via Remotion's bundled ffmpeg, runs MediaPipe
 Selfie Segmentation on each one through a headless Chromium instance (driven
 by Playwright — the model needs a real WebGL+WASM browser context, unlike the
-video textures elsewhere in this repo), and re-encodes the mattes into
-`public/mask.mp4`. Takes a few minutes for a ~200 frame clip.
+video textures elsewhere in this repo), computes each frame's dominant-hue
+estimate on a downsampled canvas in the same browser pass, and writes
+`public/mask.mp4` + `src/data/scene-colors.json`. Takes a few minutes for a
+~200 frame clip.
 
-**Known limitation:** MediaPipe's segmenter detects *people*, not arbitrary
-subjects — a shot with no person in frame (e.g. an animal-only cutaway) won't
-have anything "pop"; it just falls back to the uniform background grade for
-that shot. Swapping in a general saliency/object segmentation model would be
-the fix if that matters for your footage.
+**Known limitations:**
+- MediaPipe's segmenter detects *people*, not arbitrary subjects — a shot with
+  no person in frame (e.g. an animal-only cutaway) won't have a "foreground"
+  detected; the color-analysis fallback holds the last known hue instead of
+  guessing. Swapping in a general saliency/object segmentation model would be
+  the fix if that matters for your footage.
+- The matte isn't pixel-perfect on fast motion — a limb that briefly leaves
+  the mask's confident region can flash into the background's color instead
+  of the foreground's, which is more noticeable now that the background is a
+  strongly contrasting hue rather than just muted.
 
 ## Run it
 
