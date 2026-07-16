@@ -1,12 +1,15 @@
 # Video Color Effects (Remotion)
 
-Two [Remotion](https://www.remotion.dev/) compositions built on the same
+Three [Remotion](https://www.remotion.dev/) compositions built on the same
 source clip (`public/input.mp4`):
 
 - **`SelectiveDesaturation`** — a GLSL shader (via `@remotion/three`) that
   turns the video black & white except for a configurable hue range.
 - **`ColorGrade`** — a plain CSS-filter grade: boosted saturation + contrast,
   with the hue rotating continuously over the clip.
+- **`ForegroundPop`** — a GLSL shader that boosts saturation/brightness on the
+  foreground subject and mutes (not fully desaturates) the background, using a
+  precomputed **person-segmentation matte** rather than a color-based mask.
 
 ## `SelectiveDesaturation`
 
@@ -90,6 +93,51 @@ uniformly makes it pop *relative to* the background for free.
 - **More/less vivid?** Change `saturation`.
 - **Punchier shadows/highlights?** Change `contrast`.
 
+## `ForegroundPop`
+
+The hue- and color-based masks above can only preserve *colors*, not a
+specific *subject* — they can't tell "the person" from "anything else that
+happens to be pink." This composition instead uses real subject segmentation:
+[MediaPipe Selfie Segmentation](https://ai.google.dev/edge/mediapipe/solutions/vision/image_segmenter)
+generates a soft foreground alpha matte for every frame ahead of time
+(`scripts/generate-mask.js` → `public/mask.mp4`), and the shader in
+[`src/foregroundPopShader.ts`](src/foregroundPopShader.ts) reads that matte
+alongside the color video to grade the two regions differently — effectively
+the "two layers, two color filters" idea, composited by an alpha mask instead
+of literally cut into two clips:
+
+```ts
+export const defaultForegroundPopProps = {
+  foregroundSaturation: 1.25, // >1 = subject more vivid
+  foregroundBrightness: 1.08, // >1 = subject brighter
+  backgroundSaturation: 0.35, // <1 = muted, but NOT 0 (never fully gray)
+  backgroundBrightness: 0.8,  // <1 = slightly dimmed, pushes focus to subject
+};
+```
+
+All four are per-channel multipliers on the pixel's HSV saturation/value — hue
+is never touched, only how vivid/bright it reads. Tune `backgroundSaturation`
+down toward 0 for a more dramatic pop, or up toward 1 for a subtler grade.
+
+**Regenerating the matte:** if you swap in a different source video (or
+change its resolution/fps/duration in `src/Root.tsx`), re-run:
+
+```bash
+npm run generate-mask
+```
+
+This extracts every frame via Remotion's bundled ffmpeg, runs MediaPipe
+Selfie Segmentation on each one through a headless Chromium instance (driven
+by Playwright — the model needs a real WebGL+WASM browser context, unlike the
+video textures elsewhere in this repo), and re-encodes the mattes into
+`public/mask.mp4`. Takes a few minutes for a ~200 frame clip.
+
+**Known limitation:** MediaPipe's segmenter detects *people*, not arbitrary
+subjects — a shot with no person in frame (e.g. an animal-only cutaway) won't
+have anything "pop"; it just falls back to the uniform background grade for
+that shot. Swapping in a general saliency/object segmentation model would be
+the fix if that matters for your footage.
+
 ## Run it
 
 ```bash
@@ -98,9 +146,14 @@ npm install
 # Interactive studio (tweak props live)
 npm run dev
 
-# Render either composition
+# One-time: generate public/mask.mp4 for ForegroundPop (already committed
+# for the bundled input.mp4, only needed again if you change the source video)
+npm run generate-mask
+
+# Render any composition
 npx remotion render SelectiveDesaturation out/desaturation.mp4
 npx remotion render ColorGrade out/colorgrade.mp4
+npx remotion render ForegroundPop out/foregroundpop.mp4
 ```
 
 The source clip is `public/input.mp4` and both compositions are `1080x1920`
@@ -118,7 +171,13 @@ npx remotion render ColorGrade out/colorgrade.mp4 \
 ```
 
 Note: the `<Video>` tag requires the browser itself to decode H.264, which a
-stock headless-shell build may not support — both compositions here use
+stock headless-shell build may not support — all compositions here use
 `<OffthreadVideo>` / `useOffthreadVideoTexture()`, which decode frames via
 Remotion's bundled FFmpeg instead and work regardless of browser codec
 support.
+
+`scripts/generate-mask.js` similarly needs a real Chromium binary for
+Playwright — it defaults to a `chrome-headless-shell`-adjacent path used in
+this project's dev sandbox; edit `CHROME_EXECUTABLE` at the top of the script
+if yours lives elsewhere (a full Chromium build, not `chrome-headless-shell`,
+since it needs WebGL).

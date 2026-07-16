@@ -1,16 +1,18 @@
 {
   "name": "selective-desaturation",
   "version": "1.0.0",
-  "description": "Remotion composition that desaturates a video to black & white while preserving a configurable hue range, via a GLSL fragment shader on @remotion/three.",
+  "description": "Remotion compositions for video color grading: hue-selective desaturation, animated CSS color grading, and a segmentation-based foreground pop, via GLSL shaders on @remotion/three.",
   "scripts": {
     "dev": "remotion studio",
     "build": "remotion render SelectiveDesaturation out/video.mp4",
     "upgrade": "remotion upgrade",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "generate-mask": "node scripts/generate-mask.js"
   },
   "dependencies": {
-    "@remotion/three": "^4.0.0",
+    "@mediapipe/selfie_segmentation": "^0.1.1675465747",
     "@react-three/fiber": "^8.16.0",
+    "@remotion/three": "^4.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "remotion": "^4.0.0",
@@ -20,6 +22,7 @@
     "@remotion/cli": "^4.0.0",
     "@types/react": "^18.3.1",
     "@types/three": "^0.169.0",
+    "playwright": "^1.61.1",
     "typescript": "^5.4.5"
   }
 }
