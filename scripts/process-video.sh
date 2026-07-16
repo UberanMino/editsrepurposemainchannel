@@ -6,17 +6,20 @@
 # captions pulled from the shared, rotating text bank.
 #
 # Usage:
-#   scripts/process-video.sh <input-video> [project-name]
+#   scripts/process-video.sh <input-video> [project-name] [intensity-multiplier]
 #
-# If project-name is omitted it's derived from the input filename. Output
-# lands at out/<project-name>.mp4.
+# If project-name is omitted it's derived from the input filename.
+# intensity-multiplier defaults to a random draw from [1.3, 1.7]; pass one
+# explicitly (e.g. 1.7) to pin it for a specific test/video. Output lands at
+# out/<project-name>.mp4.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO_ROOT"
 
-INPUT_VIDEO="${1:?Usage: scripts/process-video.sh <input-video> [project-name]}"
+INPUT_VIDEO="${1:?Usage: scripts/process-video.sh <input-video> [project-name] [intensity-multiplier]}"
 PROJECT_NAME="${2:-$(basename "$INPUT_VIDEO" | sed 's/\.[^.]*$//')}"
+INTENSITY_MULTIPLIER="${3:-}"
 
 BROWSER_EXECUTABLE="${REMOTION_BROWSER_EXECUTABLE:-/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell}"
 
@@ -28,8 +31,13 @@ echo "== [$PROJECT_NAME] copying source into public/ =="
 cp "$INPUT_VIDEO" "$PUBLIC_PATH"
 
 ANALYSIS_JSON="/tmp/pipeline-work/${PROJECT_NAME}-analysis.json"
-echo "== [$PROJECT_NAME] analyzing beats + cuts (intensity randomized within [1.3, 1.7]) =="
-python3 scripts/analyze_video.py "$PUBLIC_PATH" "$ANALYSIS_JSON"
+if [ -n "$INTENSITY_MULTIPLIER" ]; then
+  echo "== [$PROJECT_NAME] analyzing beats + cuts (intensity pinned at ${INTENSITY_MULTIPLIER}x) =="
+  python3 scripts/analyze_video.py "$PUBLIC_PATH" "$ANALYSIS_JSON" --intensity-multiplier "$INTENSITY_MULTIPLIER"
+else
+  echo "== [$PROJECT_NAME] analyzing beats + cuts (intensity randomized within [1.3, 1.7]) =="
+  python3 scripts/analyze_video.py "$PUBLIC_PATH" "$ANALYSIS_JSON"
+fi
 
 STATE_PATH="src/data/pipeline-state.json"
 PREV_HAD_CAPTIONS=$(jq -r '.lastHadCaptions' "$STATE_PATH")

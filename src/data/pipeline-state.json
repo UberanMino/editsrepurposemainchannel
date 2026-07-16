@@ -1,6 +1,6 @@
 {
   "description": "Tracks how many videos scripts/process-video.sh has run through the pipeline, so it can alternate captions on for every second video as requested. Updated automatically by process-video.sh — don't hand-edit unless you're deliberately resetting the rotation.",
-  "videosProcessed": 1,
-  "lastProjectName": "ma_mind_einfach_mindisch_1",
-  "lastHadCaptions": true
+  "videosProcessed": 2,
+  "lastProjectName": "need-some-lovin-69",
+  "lastHadCaptions": false
 }

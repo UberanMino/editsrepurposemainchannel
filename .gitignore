@@ -3,3 +3,10 @@ out/
 .mask-scratch/
 .DS_Store
 *.log
+
+# Batch pipeline (scripts/process-video.sh) working data: source videos and
+# generated per-video props for the many videos this repo will process are
+# not meant to live in git, only the pipeline code and shared rotation state
+# (src/data/pipeline-state.json, src/data/surreal-text-bank.json) are.
+public/*.mp4
+src/data/props/
