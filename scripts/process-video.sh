@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runs one input video through the full beat-synced edit pipeline:
 # mirror + beat-triggered zoom/stretch/glitch effects (intensity randomized
-# per video, within [1.0x, 1.2x] of the tuned baseline) and, on every other
+# per video, within [1.3x, 1.7x] of the tuned baseline) and, on every other
 # video (tracked in src/data/pipeline-state.json), 2-3 sporadic surreal
 # captions pulled from the shared, rotating text bank.
 #
@@ -28,7 +28,7 @@ echo "== [$PROJECT_NAME] copying source into public/ =="
 cp "$INPUT_VIDEO" "$PUBLIC_PATH"
 
 ANALYSIS_JSON="/tmp/pipeline-work/${PROJECT_NAME}-analysis.json"
-echo "== [$PROJECT_NAME] analyzing beats + cuts (intensity randomized within [1.0, 1.2]) =="
+echo "== [$PROJECT_NAME] analyzing beats + cuts (intensity randomized within [1.3, 1.7]) =="
 python3 scripts/analyze_video.py "$PUBLIC_PATH" "$ANALYSIS_JSON"
 
 STATE_PATH="src/data/pipeline-state.json"
