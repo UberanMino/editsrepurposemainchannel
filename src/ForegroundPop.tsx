@@ -61,19 +61,20 @@ export type ForegroundPopProps = {
 
 /**
  * Sensible defaults: subject pops, background is vivid in a contrasting
- * color and gently liquified — dialed to ~25% intensity (each multiplier's
- * departure from "neutral" is scaled to a quarter of its original strength).
+ * color and gently liquified — dialed to ~60% intensity (each multiplier's
+ * departure from "neutral" is scaled to 60% of its original full-strength
+ * value; see README.md for the full-strength numbers).
  */
 export const defaultForegroundPopProps: Omit<
   ForegroundPopProps,
   "src" | "maskSrc" | "backgroundHues"
 > = {
-  foregroundSaturation: 1.06,
-  foregroundBrightness: 1.02,
-  backgroundSaturation: 1.04,
-  backgroundBrightness: 0.98,
-  backgroundColorizeStrength: 0.2,
-  liquifyAmount: 0.003,
+  foregroundSaturation: 1.15,
+  foregroundBrightness: 1.05,
+  backgroundSaturation: 1.09,
+  backgroundBrightness: 0.95,
+  backgroundColorizeStrength: 0.48,
+  liquifyAmount: 0.0072,
   liquifyScale: 8,
   liquifySpeed: 0.8,
 };

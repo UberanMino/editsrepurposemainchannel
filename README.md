@@ -121,19 +121,28 @@ one side:
 
 ```ts
 // Each multiplier's departure from "neutral" (1, or 0 for the two strength
-// knobs) is dialed to ~25% of a much stronger first pass — see the numbers
-// in parens for what "full strength" looked like.
+// knobs) is dialed to ~60% of a much stronger first pass — see the numbers
+// in parens for what "full strength" looked like. (An earlier ~25% pass
+// read as barely different from the original footage, so this was dialed
+// back up.)
 export const defaultForegroundPopProps = {
-  foregroundSaturation: 1.06, // >1 = subject more vivid (full strength: 1.25)
-  foregroundBrightness: 1.02, // >1 = subject brighter (full strength: 1.08)
-  backgroundSaturation: 1.04, // >1 = background vivid too, not muted (full strength: 1.15)
-  backgroundBrightness: 0.98, // <1 = very slightly dimmer, keeps subject primary (full strength: 0.92)
-  backgroundColorizeStrength: 0.2, // 0 = background keeps its own hue, 1 = fully replaced (full strength: 0.8)
-  liquifyAmount: 0.003, // ripple displacement, in UV units (full strength: 0.012)
-  liquifyScale: 8,      // ripple frequency — a pattern-shape knob, not scaled down
-  liquifySpeed: 0.8,    // ripple animation speed — also not scaled down
+  foregroundSaturation: 1.15, // >1 = subject more vivid (full strength: 1.25)
+  foregroundBrightness: 1.05, // >1 = subject brighter (full strength: 1.08)
+  backgroundSaturation: 1.09, // >1 = background vivid too, not muted (full strength: 1.15)
+  backgroundBrightness: 0.95, // <1 = very slightly dimmer, keeps subject primary (full strength: 0.92)
+  backgroundColorizeStrength: 0.48, // 0 = background keeps its own hue, 1 = fully replaced (full strength: 0.8)
+  liquifyAmount: 0.0072, // ripple displacement, in UV units (full strength: 0.012)
+  liquifyScale: 8,       // ripple frequency — a pattern-shape knob, not scaled down
+  liquifySpeed: 0.8,     // ripple animation speed — also not scaled down
 };
 ```
+
+Note the visible strength isn't perfectly linear with these numbers — a
+scene with saturated, colorful lighting (e.g. neon/disco lighting) will read
+as a much bolder grade than a flatly-lit or overexposed shot at the exact
+same parameter values, since `backgroundSaturation` multiplies whatever
+saturation the recolor left behind, and blown highlights leave little room
+for `foregroundBrightness` to do anything visible.
 
 **Which color does the background become?** This is computed per frame, not
 hardcoded: `scripts/generate-mask.js` samples the dominant hue of the
