@@ -235,16 +235,15 @@ export const BeatEffects: React.FC<BeatEffectsProps> = ({
         style={{
           position: "absolute",
           ...CORNER_STYLE[activeClip.corner],
-          maxWidth: "42%",
+          maxWidth: "46%",
           fontFamily: "'Courier New', Courier, monospace",
-          fontWeight: 700,
-          textTransform: "uppercase",
-          letterSpacing: "0.04em",
-          lineHeight: 1.25,
+          fontWeight: 600,
+          letterSpacing: "0.02em",
+          lineHeight: 1.3,
           fontSize: activeClip.fontSizePx,
-          color: "rgba(255,255,255,0.92)",
-          textShadow:
-            "0 0 6px rgba(0,0,0,0.85), 0 0 2px rgba(0,0,0,0.9), 1px 1px 0 rgba(0,0,0,0.6)",
+          color: "rgba(255,255,255,0.85)",
+          textShadow: "0 0 3px rgba(0,0,0,0.4)",
+          mixBlendMode: "overlay",
           opacity,
           transform: `rotate(${activeClip.rotationDeg}deg) scale(${scale})`,
           transformOrigin:

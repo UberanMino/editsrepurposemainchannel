@@ -71,13 +71,18 @@ const clipAssignments = chosen.map((entry, i) => {
   bankEntry.lastUsedAt = now;
   bankEntry.lastUsedInProject = projectName;
 
+  // longer sentence-style lines get a smaller size so they still read as a
+  // tucked-away note rather than a subtitle block
+  const baseSize =
+    entry.text.length > 60 ? 20 : entry.text.length > 35 ? 24 : 28;
+
   return {
     clipIndex: i,
     text: entry.text,
     corner,
     // small per-clip random tilt/size so it doesn't look like a template
     rotationDeg: Math.round((Math.random() * 6 - 3) * 10) / 10,
-    fontSizePx: 26 + Math.round(Math.random() * 8),
+    fontSizePx: baseSize + Math.round(Math.random() * 4),
   };
 });
 
