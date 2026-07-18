@@ -17,9 +17,11 @@ If --intensity-multiplier is omitted, one is drawn uniformly from
 reported in the output JSON so it's logged per video.
 """
 import argparse
+import glob
 import json
 import os
 import random
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -27,9 +29,43 @@ import tempfile
 import numpy as np
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-FFMPEG = os.path.join(
-    REPO_ROOT, "node_modules", "@remotion", "compositor-linux-x64-gnu", "ffmpeg"
-)
+
+
+def _works(exe_path):
+    try:
+        subprocess.run([exe_path, "-version"], capture_output=True, timeout=10)
+        return True
+    except (OSError, subprocess.SubprocessError):
+        # e.g. a musl-linked binary's dynamic loader missing on a glibc host,
+        # or an unrelated platform's compositor package present on disk
+        return False
+
+
+def _find_ffmpeg():
+    """Locate an ffmpeg binary: prefer one bundled with whichever
+    @remotion/compositor-* package(s) npm installed (no separate download
+    needed), falling back to a system ffmpeg on PATH. npm can end up with
+    more than one platform variant on disk (e.g. both the gnu and musl
+    linux builds) so each candidate is actually exec'd, not just checked
+    for existence, before it's trusted."""
+    compositor_glob = os.path.join(REPO_ROOT, "node_modules", "@remotion", "compositor-*")
+    exe_name = "ffmpeg.exe" if os.name == "nt" else "ffmpeg"
+    for compositor_dir in sorted(glob.glob(compositor_glob)):
+        candidate = os.path.join(compositor_dir, exe_name)
+        if os.path.isfile(candidate) and _works(candidate):
+            return candidate
+
+    system_ffmpeg = shutil.which("ffmpeg")
+    if system_ffmpeg and _works(system_ffmpeg):
+        return system_ffmpeg
+
+    raise RuntimeError(
+        "No working ffmpeg found: expected a node_modules/@remotion/compositor-*/ffmpeg "
+        "(run `npm install` first) or a system ffmpeg on PATH."
+    )
+
+
+FFMPEG = _find_ffmpeg()
 FPS = 30
 
 

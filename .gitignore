@@ -10,3 +10,4 @@ out/
 # (src/data/pipeline-state.json, src/data/surreal-text-bank.json) are.
 public/*.mp4
 src/data/props/
+scripts/__pycache__/

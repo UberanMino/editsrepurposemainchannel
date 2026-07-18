@@ -21,7 +21,11 @@ INPUT_VIDEO="${1:?Usage: scripts/process-video.sh <input-video> [project-name] [
 PROJECT_NAME="${2:-$(basename "$INPUT_VIDEO" | sed 's/\.[^.]*$//')}"
 INTENSITY_MULTIPLIER="${3:-}"
 
-BROWSER_EXECUTABLE="${REMOTION_BROWSER_EXECUTABLE:-/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell}"
+# Only set REMOTION_BROWSER_EXECUTABLE if you're on a machine where Remotion
+# can't download its own headless Chrome (e.g. this sandboxed dev container).
+# On a normal local machine, leave it unset and Remotion manages its own
+# browser automatically.
+BROWSER_EXECUTABLE="${REMOTION_BROWSER_EXECUTABLE:-}"
 
 SRC_FILENAME="${PROJECT_NAME}.mp4"
 PUBLIC_PATH="public/${SRC_FILENAME}"
@@ -73,9 +77,10 @@ fs.writeFileSync('$STATE_PATH', JSON.stringify(state, null, 2) + '\n');
 
 OUT_VIDEO="out/${PROJECT_NAME}.mp4"
 echo "== [$PROJECT_NAME] rendering =="
-npx remotion render BeatEffects "$OUT_VIDEO" \
-  --props="$PROPS_JSON" \
-  --browser-executable="$BROWSER_EXECUTABLE" \
-  --concurrency=4
+RENDER_ARGS=(render BeatEffects "$OUT_VIDEO" --props="$PROPS_JSON" --concurrency=4)
+if [ -n "$BROWSER_EXECUTABLE" ]; then
+  RENDER_ARGS+=(--browser-executable="$BROWSER_EXECUTABLE")
+fi
+npx remotion "${RENDER_ARGS[@]}"
 
 echo "== [$PROJECT_NAME] done: $OUT_VIDEO =="
