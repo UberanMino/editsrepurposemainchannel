@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runs one input video through the full beat-synced edit pipeline:
 # mirror + beat-triggered zoom/stretch/glitch effects (intensity randomized
-# per video, within [1.3x, 1.7x] of the tuned baseline) and, on every other
+# per video, within [1.4x, 1.6x] of the tuned baseline) and, on every other
 # video (tracked in src/data/pipeline-state.json), 2-3 sporadic surreal
 # captions pulled from the shared, rotating text bank.
 #
@@ -9,7 +9,7 @@
 #   scripts/process-video.sh <input-video> [project-name] [intensity-multiplier]
 #
 # If project-name is omitted it's derived from the input filename.
-# intensity-multiplier defaults to a random draw from [1.3, 1.7]; pass one
+# intensity-multiplier defaults to a random draw from [1.4, 1.6]; pass one
 # explicitly (e.g. 1.7) to pin it for a specific test/video. Output lands at
 # out/<project-name>.mp4.
 set -euo pipefail
@@ -35,7 +35,7 @@ if [ -n "$INTENSITY_MULTIPLIER" ]; then
   echo "== [$PROJECT_NAME] analyzing beats + cuts (intensity pinned at ${INTENSITY_MULTIPLIER}x) =="
   python3 scripts/analyze_video.py "$PUBLIC_PATH" "$ANALYSIS_JSON" --intensity-multiplier "$INTENSITY_MULTIPLIER"
 else
-  echo "== [$PROJECT_NAME] analyzing beats + cuts (intensity randomized within [1.3, 1.7]) =="
+  echo "== [$PROJECT_NAME] analyzing beats + cuts (intensity randomized within [1.4, 1.6]) =="
   python3 scripts/analyze_video.py "$PUBLIC_PATH" "$ANALYSIS_JSON"
 fi
 

@@ -13,7 +13,7 @@ Usage:
   python3 scripts/analyze_video.py <input.mp4> <out.json> [--intensity-multiplier X] [--seed N]
 
 If --intensity-multiplier is omitted, one is drawn uniformly from
-[1.3, 1.7] (tuned after reviewing test renders at 1.2x and 1.5x) and
+[1.4, 1.6] (tuned after reviewing test renders at 1.2x and 1.5x) and
 reported in the output JSON so it's logged per video.
 """
 import argparse
@@ -231,9 +231,9 @@ def main():
 
     intensity_multiplier = args.intensity_multiplier
     if intensity_multiplier is None:
-        intensity_multiplier = round(rng.uniform(1.3, 1.7), 3)
-    if not (1.3 <= intensity_multiplier <= 1.7):
-        print(f"warning: intensity multiplier {intensity_multiplier} outside the agreed [1.3, 1.7] range", file=sys.stderr)
+        intensity_multiplier = round(rng.uniform(1.4, 1.6), 3)
+    if not (1.4 <= intensity_multiplier <= 1.6):
+        print(f"warning: intensity multiplier {intensity_multiplier} outside the agreed [1.4, 1.6] range", file=sys.stderr)
 
     total_frames = probe_duration_and_frames(args.input_video)
 
